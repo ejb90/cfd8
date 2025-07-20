@@ -8,27 +8,7 @@ import pyvista as pv
 matplotlib.use('Qt5Agg')
 
 
-def read_density_from_vtu(mesh, density_field='density'):
-    """Reads density data from a VTU file.
-
-    Args:
-        mesh (pyvista.UnstructuredGrid): Loaded VTU mesh.
-        density_field (str): Name of the density field in the file.
-
-    Returns:
-        numpy.ndarray: Array of density values.
-    """
-    if density_field not in mesh.point_data and density_field not in mesh.cell_data:
-        raise ValueError(f"'{density_field}' not found in point or cell data.")
-
-    # Check both point_data and cell_data
-    if density_field in mesh.point_data:
-        return mesh.point_data[density_field]
-    else:
-        return mesh.cell_data[density_field]
-
-
-def get_bubble_interface_position(mesh, field_name='volume_fraction'):
+def get_bubble_interface_position(mesh, field_name='volume_fraction', volfrac_cutoff=1e-6, symmetry_line=None, symmetry_line_tol=1e-4):
     """Get the upstream/downstream/jet position of the bubble for a given cycle.
 
     Args:
@@ -42,13 +22,14 @@ def get_bubble_interface_position(mesh, field_name='volume_fraction'):
 
     centroids = []
     for i, rho in enumerate(rho_values):
-        if rho > 0.0:
+        if rho > volfrac_cutoff:
             centroids.append(mesh.cell_centers().points[i])
     centroids = np.asarray(centroids)
 
-    ycentre = (mesh.bounds[2] + mesh.bounds[3]) / 2.0
+    if symmetry_line is None:
+        symmetry_line = (mesh.bounds[2] + mesh.bounds[3]) / 2.0
     x_coords = centroids[:, 0]  # Extract x positions
-    axial_centroid = centroids[np.abs(centroids[:, 1] - ycentre) < 0.01]
+    axial_centroid = centroids[np.abs(centroids[:, 1] - symmetry_line) < symmetry_line_tol]
 
     upstream = x_coords.min()
     downstream = x_coords.max()
@@ -72,12 +53,8 @@ def extract_interface_positions(root):
     return sorted_array
 
 
-if __name__ == "__main__":
-    root = pathlib.Path("../../../../provided/ELLIS-ucns3d/RUN_EXAMPLES/2D/medium/")
-    data = extract_interface_positions(root)
-    np.save("medium.npy", data)
-    # data = np.load("medium.npy")
-
+def plot_interface_vs_time(data, label=""):
+    """"""
     fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111)
     ax.grid()
@@ -89,5 +66,28 @@ if __name__ == "__main__":
     ax.plot(data[:, 3], data[:, 0], label="Jet")
 
     ax.legend()
-    plt.show()
-    fig.savefig("interfaces")
+    # plt.show()
+    fig.savefig(f"interfaces_{label}")
+
+
+def main(res):
+    """"""
+    # root = pathlib.Path("../../../../provided/ELLIS-ucns3d/RUN_EXAMPLES/2D/medium/")
+    root = pathlib.Path(f"/Users/ellis/Documents/msc_cfd/08_dissertation/provided/RUN_EXAMPLES/2D/{res}")
+    data = extract_interface_positions(root)
+    np.save(f"{res}.npy", data)
+    # data = np.load(f"{res}.npy")
+    plot_interface_vs_time(data, label=res)
+
+
+if __name__ == "__main__":
+    # main("medium")
+    # main("fine")
+    main("finex2")
+
+
+
+    # fname = pathlib.Path("/Users/ellis/Documents/msc_cfd/08_dissertation/provided/RUN_EXAMPLES/2D/medium/OUT_2359.vtu")
+    # mesh = pv.read(fname)
+    # x = mesh.cell_data["volume_fraction"]
+    # print(min(x), max(x))
