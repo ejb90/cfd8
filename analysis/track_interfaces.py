@@ -8,26 +8,6 @@ import pyvista as pv
 matplotlib.use('Qt5Agg')
 
 
-def read_density_from_vtu(mesh, density_field='density'):
-    """Reads density data from a VTU file.
-
-    Args:
-        mesh (pyvista.UnstructuredGrid): Loaded VTU mesh.
-        density_field (str): Name of the density field in the file.
-
-    Returns:
-        numpy.ndarray: Array of density values.
-    """
-    if density_field not in mesh.point_data and density_field not in mesh.cell_data:
-        raise ValueError(f"'{density_field}' not found in point or cell data.")
-
-    # Check both point_data and cell_data
-    if density_field in mesh.point_data:
-        return mesh.point_data[density_field]
-    else:
-        return mesh.cell_data[density_field]
-
-
 def get_bubble_interface_position(mesh, field_name='volume_fraction'):
     """Get the upstream/downstream/jet position of the bubble for a given cycle.
 
@@ -72,18 +52,15 @@ def extract_interface_positions(root):
     return sorted_array
 
 
-if __name__ == "__main__":
-    root = pathlib.Path("../../../../provided/ELLIS-ucns3d/RUN_EXAMPLES/2D/medium/")
-    data = extract_interface_positions(root)
-    np.save("medium.npy", data)
-    # data = np.load("medium.npy")
+def plot_interface_positions(root):
+    """Extract and plot interface positions."""
+    # data = extract_interface_positions(root)
+    # np.save("medium.npy", data)
+    data = np.load("medium.npy")
 
     fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111)
     ax.grid()
-    # ax.plot(data[:, 0], data[:, 1], label="Upstream")
-    # ax.plot(data[:, 0], data[:, 2], label="Downstream")
-    # ax.plot(data[:, 0], data[:, 3], label="Jet")
     ax.plot(data[:, 1], data[:, 0], label="Upstream")
     ax.plot(data[:, 2], data[:, 0], label="Downstream")
     ax.plot(data[:, 3], data[:, 0], label="Jet")
@@ -91,3 +68,8 @@ if __name__ == "__main__":
     ax.legend()
     plt.show()
     fig.savefig("interfaces")
+
+
+if __name__ == "__main__":
+    root = pathlib.Path("/home/ellis/Documents/cfd_msc/08_dissertation/provided/ELLIS-ucns3d/RUN_EXAMPLES/2D/medium/")
+    plot_interface_positions(root)
