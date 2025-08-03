@@ -69,8 +69,8 @@ def plot_interface_vs_time(data, label=""):
 
 def main(res):
     """"""
-    # root = pathlib.Path("../../../../provided/ELLIS-ucns3d/RUN_EXAMPLES/2D/medium/")
-    root = pathlib.Path(f"/Users/ellis/Documents/msc_cfd/08_dissertation/provided/RUN_EXAMPLES/2D/{res}")
+    # root = pathlib.Path(f"/Users/ellis/Documents/msc_cfd/08_dissertation/provided/RUN_EXAMPLES/2D/{res}")
+    root = pathlib.Path(f"/home/ellis/Documents/cfd_msc/08_dissertation/provided/ELLIS-ucns3d/RUN_EXAMPLES/2D/{res}/")
     data = extract_interface_positions(root)
     np.save(f"{res}.npy", data)
     # data = np.load(f"{res}.npy")
@@ -78,13 +78,5 @@ def main(res):
 
 
 if __name__ == "__main__":
-    # main("medium")
-    # main("fine")
     main("finex2")
-
-
-
-    # fname = pathlib.Path("/Users/ellis/Documents/msc_cfd/08_dissertation/provided/RUN_EXAMPLES/2D/medium/OUT_2359.vtu")
-    # mesh = pv.read(fname)
-    # x = mesh.cell_data["volume_fraction"]
-    # print(min(x), max(x))
+    # main("medium")

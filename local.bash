@@ -28,4 +28,5 @@ ln -sf ../../GKlib/build/Linux-x86_64/libGKlib.a
 ln -sf ../../METIS/build/libmetis/libmetis.a
 ln -sf ../../ParMETIS/build/Linux-x86_64/libparmetis/libparmetis.a
 ln -sf ../bin/lib/tecplot/libtecio.a
-make -f ../bin/gnu-compiler/Makefile clean all
+ln -s ../bin/gnu-compiler/Makefile Makefile
+# make -f ../bin/gnu-compiler/Makefile clean all
